@@ -18,7 +18,9 @@ final class FetchBitcoinPriceUseCase {
         self.repository = repository
     }
     
-    func fetch() {}
+    func fetch() async throws {
+        try await repository.execute()
+    }
 }
 
 final class FetchBitcoinPriceUseCaseTests: XCTestCase {
@@ -29,11 +31,26 @@ final class FetchBitcoinPriceUseCaseTests: XCTestCase {
         XCTAssertEqual(repository.messages, [])
     }
     
+    func test_fetch_repoExecute() async {
+        let repository = FetchBitcoinPriceRepositorySpy()
+        let sut = FetchBitcoinPriceUseCase(repository: repository)
+        
+        do {
+            try await sut.fetch()
+        } catch {
+            XCTFail()
+        }
+        
+        XCTAssertEqual(repository.messages, ["executed"])
+    }
+    
     // MARK: Helpers
     private final class FetchBitcoinPriceRepositorySpy: FetchBitcoinPriceRepositoryProtocol {
-        let messages: [String] = []
+        var messages: [String] = []
         
-        func execute() async throws {}
+        func execute() async throws {
+            messages.append("executed")
+        }
     }
 
 }
