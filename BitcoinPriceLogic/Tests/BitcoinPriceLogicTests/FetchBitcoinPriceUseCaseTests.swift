@@ -39,7 +39,7 @@ final class FetchBitcoinPriceUseCaseTests: XCTestCase {
             XCTFail()
         }
         
-        XCTAssertEqual(repository.messages, ["executed"])
+        XCTAssertEqual(repository.messages, [.Executed])
     }
     
     func test_fetchMore_repoExecuteMore() async {
@@ -52,15 +52,19 @@ final class FetchBitcoinPriceUseCaseTests: XCTestCase {
             XCTFail()
         }
         
-        XCTAssertEqual(repository.messages, ["executed", "executed"])
+        XCTAssertEqual(repository.messages, [.Executed, .Executed])
     }
     
     // MARK: Helpers
     private final class FetchBitcoinPriceRepositorySpy: FetchBitcoinPriceRepositoryProtocol {
-        var messages: [String] = []
+        private(set) var messages: [Message] = []
         
         func execute() async throws {
-            messages.append("executed")
+            messages.append(.Executed)
+        }
+        
+        enum Message {
+            case Executed
         }
     }
     
