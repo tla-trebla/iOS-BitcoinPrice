@@ -25,15 +25,13 @@ final class FetchBitcoinPriceUseCase {
 
 final class FetchBitcoinPriceUseCaseTests: XCTestCase {
     func test_init_nothing() {
-        let repository = FetchBitcoinPriceRepositorySpy()
-        let _ = FetchBitcoinPriceUseCase(repository: repository)
+        let (_, repository) = makeSUT()
         
         XCTAssertEqual(repository.messages, [])
     }
     
     func test_fetch_repoExecute() async {
-        let repository = FetchBitcoinPriceRepositorySpy()
-        let sut = FetchBitcoinPriceUseCase(repository: repository)
+        let (sut, repository) = makeSUT()
         
         do {
             try await sut.fetch()
@@ -45,8 +43,7 @@ final class FetchBitcoinPriceUseCaseTests: XCTestCase {
     }
     
     func test_fetchMore_repoExecuteMore() async {
-        let repository = FetchBitcoinPriceRepositorySpy()
-        let sut = FetchBitcoinPriceUseCase(repository: repository)
+        let (sut, repository) = makeSUT()
         
         do {
             try await sut.fetch()
@@ -65,6 +62,13 @@ final class FetchBitcoinPriceUseCaseTests: XCTestCase {
         func execute() async throws {
             messages.append("executed")
         }
+    }
+    
+    private func makeSUT() -> (FetchBitcoinPriceUseCase, FetchBitcoinPriceRepositorySpy) {
+        let repository = FetchBitcoinPriceRepositorySpy()
+        let sut = FetchBitcoinPriceUseCase(repository: repository)
+        
+        return (sut, repository)
     }
 
 }
