@@ -44,6 +44,20 @@ final class FetchBitcoinPriceUseCaseTests: XCTestCase {
         XCTAssertEqual(repository.messages, ["executed"])
     }
     
+    func test_fetchMore_repoExecuteMore() async {
+        let repository = FetchBitcoinPriceRepositorySpy()
+        let sut = FetchBitcoinPriceUseCase(repository: repository)
+        
+        do {
+            try await sut.fetch()
+            try await sut.fetch()
+        } catch {
+            XCTFail()
+        }
+        
+        XCTAssertEqual(repository.messages, ["executed", "executed"])
+    }
+    
     // MARK: Helpers
     private final class FetchBitcoinPriceRepositorySpy: FetchBitcoinPriceRepositoryProtocol {
         var messages: [String] = []
