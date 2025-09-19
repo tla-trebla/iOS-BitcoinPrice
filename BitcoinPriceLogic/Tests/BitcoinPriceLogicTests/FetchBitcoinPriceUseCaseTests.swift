@@ -57,8 +57,7 @@ final class FetchBitcoinPriceUseCaseTests: XCTestCase {
     
     func test_fetch_returnPrice() async {
         let stubbedPrice = 93000
-        let repository = FetchBitcoinPriceRepositoryStub(result: .success(stubbedPrice))
-        let sut = FetchBitcoinPriceUseCase(repository: repository)
+        let sut = makeSUT(result: .success(stubbedPrice))
         var price = 0
         
         do {
@@ -72,8 +71,7 @@ final class FetchBitcoinPriceUseCaseTests: XCTestCase {
     
     func test_failToFetch_getsAnError() async {
         let stubbedError = NSError(domain: "Error", code: 1)
-        let repository = FetchBitcoinPriceRepositoryStub(result: .failure(stubbedError))
-        let sut = FetchBitcoinPriceUseCase(repository: repository)
+        let sut = makeSUT(result: .failure(stubbedError))
         var capturedError: NSError?
         
         do {
@@ -114,6 +112,13 @@ final class FetchBitcoinPriceUseCaseTests: XCTestCase {
         enum Message {
             case Executed
         }
+    }
+    
+    private func makeSUT(result: Result<Int, Error>) -> FetchBitcoinPriceUseCase {
+        let repository = FetchBitcoinPriceRepositoryStub(result: result)
+        let sut = FetchBitcoinPriceUseCase(repository: repository)
+        
+        return sut
     }
     
     private func makeSUT() -> (FetchBitcoinPriceUseCase, FetchBitcoinPriceRepositorySpy) {
