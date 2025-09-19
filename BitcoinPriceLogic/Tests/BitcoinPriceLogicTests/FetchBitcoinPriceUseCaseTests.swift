@@ -8,7 +8,7 @@
 import XCTest
 
 protocol FetchBitcoinPriceRepositoryProtocol {
-    func execute() async throws
+    func execute() async throws -> Int
 }
 
 final class FetchBitcoinPriceUseCase {
@@ -18,7 +18,7 @@ final class FetchBitcoinPriceUseCase {
         self.repository = repository
     }
     
-    func fetch() async throws {
+    func fetch() async throws -> Int {
         try await repository.execute()
     }
 }
@@ -34,7 +34,7 @@ final class FetchBitcoinPriceUseCaseTests: XCTestCase {
         let (sut, repository) = makeSUT()
         
         do {
-            try await sut.fetch()
+            _ = try await sut.fetch()
         } catch {
             XCTFail()
         }
@@ -46,8 +46,8 @@ final class FetchBitcoinPriceUseCaseTests: XCTestCase {
         let (sut, repository) = makeSUT()
         
         do {
-            try await sut.fetch()
-            try await sut.fetch()
+            _ = try await sut.fetch()
+            _ = try await sut.fetch()
         } catch {
             XCTFail()
         }
@@ -55,12 +55,40 @@ final class FetchBitcoinPriceUseCaseTests: XCTestCase {
         XCTAssertEqual(repository.messages, [.Executed, .Executed])
     }
     
+    func test_fetch_returnPrice() async {
+        let stubbedPrice = 93000
+        let repository = FetchBitcoinPriceRepositoryStub(price: stubbedPrice)
+        let sut = FetchBitcoinPriceUseCase(repository: repository)
+        var price = 0
+        
+        do {
+            price = try await sut.fetch()
+        } catch {
+            XCTFail()
+        }
+        
+        XCTAssertEqual(price, stubbedPrice)
+    }
+    
     // MARK: Helpers
+    private final class FetchBitcoinPriceRepositoryStub: FetchBitcoinPriceRepositoryProtocol {
+        private(set) var price = 0
+        
+        init(price: Int = 0) {
+            self.price = price
+        }
+        
+        func execute() async throws -> Int {
+            price
+        }
+    }
+    
     private final class FetchBitcoinPriceRepositorySpy: FetchBitcoinPriceRepositoryProtocol {
         private(set) var messages: [Message] = []
         
-        func execute() async throws {
+        func execute() async throws -> Int {
             messages.append(.Executed)
+            return 0
         }
         
         enum Message {
