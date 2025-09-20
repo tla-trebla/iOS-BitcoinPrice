@@ -5,23 +5,8 @@
 //  Created by Albert Pangestu on 28/04/25.
 //
 
+@testable import BitcoinPriceLogic
 import XCTest
-
-protocol FetchBitcoinPriceRepositoryProtocol {
-    func execute() async throws -> Int
-}
-
-final class FetchBitcoinPriceUseCase {
-    private let repository: FetchBitcoinPriceRepositoryProtocol
-    
-    init(repository: FetchBitcoinPriceRepositoryProtocol) {
-        self.repository = repository
-    }
-    
-    func fetch() async throws -> Int {
-        try await repository.execute()
-    }
-}
 
 final class FetchBitcoinPriceUseCaseTests: XCTestCase {
     func test_init_nothing() {
